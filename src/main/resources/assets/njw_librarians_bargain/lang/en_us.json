@@ -1,0 +1,18 @@
+{
+  "item.njw_librarians_bargain.mysterious_contract": "Mysterious Contract",
+  "message.njw_librarians_bargain.not_librarian": "The Mysterious Contract can only be used with librarians.",
+  "message.njw_librarians_bargain.already_traded": "The Mysterious Contract can only be used with untraded librarians.",
+  "message.njw_librarians_bargain.no_enchanted_book": "The librarian must offer an enchanted book to bargain.",
+  "message.njw_librarians_bargain.no_diamonds": "You need %s Diamonds to bargain.",
+  "menu.njw_librarians_bargain.bargain": "Bargain with Librarian",
+  "menu.njw_librarians_bargain.current_offer": "Current Offer",
+  "menu.njw_librarians_bargain.new_offers": "New Offers",
+  "menu.njw_librarians_bargain.enchantment_lock": "Enchantment: Lock",
+  "menu.njw_librarians_bargain.enchantment_locked": "Enchantment: Locked",
+  "menu.njw_librarians_bargain.level_lock": "Level: Lock",
+  "menu.njw_librarians_bargain.level_locked": "Level: Locked",
+  "menu.njw_librarians_bargain.bargain_cost": "Bargain Cost",
+  "menu.njw_librarians_bargain.diamond_cost_value": "%s Diamonds",
+  "menu.njw_librarians_bargain.bargain_action": "Bargain",
+  "menu.njw_librarians_bargain.rebargain": "Bargain Again"
+}

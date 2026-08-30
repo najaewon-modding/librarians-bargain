@@ -1,0 +1,18 @@
+{
+  "item.njw_librarians_bargain.mysterious_contract": "신비한 계약서",
+  "message.njw_librarians_bargain.not_librarian": "신비한 계약서는 사서 주민에게만 사용할 수 있습니다.",
+  "message.njw_librarians_bargain.already_traded": "신비한 계약서는 아직 거래하지 않은 사서에게만 사용할 수 있습니다.",
+  "message.njw_librarians_bargain.no_enchanted_book": "흥정하려면 사서의 거래 목록에 마법이 부여된 책이 있어야 합니다.",
+  "message.njw_librarians_bargain.no_diamonds": "흥정하려면 다이아몬드가 %s개 필요합니다.",
+  "menu.njw_librarians_bargain.bargain": "사서와 흥정",
+  "menu.njw_librarians_bargain.current_offer": "현재 거래",
+  "menu.njw_librarians_bargain.new_offers": "새로운 제안",
+  "menu.njw_librarians_bargain.enchantment_lock": "마법부여: 고정하기",
+  "menu.njw_librarians_bargain.enchantment_locked": "마법부여: 고정됨",
+  "menu.njw_librarians_bargain.level_lock": "레벨: 고정하기",
+  "menu.njw_librarians_bargain.level_locked": "레벨: 고정됨",
+  "menu.njw_librarians_bargain.bargain_cost": "흥정 비용",
+  "menu.njw_librarians_bargain.diamond_cost_value": "다이아몬드 %s개",
+  "menu.njw_librarians_bargain.bargain_action": "흥정하기",
+  "menu.njw_librarians_bargain.rebargain": "다시 흥정하기"
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:book",
+    "minecraft:emerald",
+    "minecraft:feather"
+  ],
+  "result": {
+    "id": "njw_librarians_bargain:mysterious_contract",
+    "count": 1
+  }
+}

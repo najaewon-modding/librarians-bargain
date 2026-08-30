@@ -1,0 +1,12 @@
+{
+  "criteria": {
+    "traded_with_villager": {
+      "trigger": "minecraft:villager_trade"
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "njw_librarians_bargain:mysterious_contract"
+    ]
+  }
+}
