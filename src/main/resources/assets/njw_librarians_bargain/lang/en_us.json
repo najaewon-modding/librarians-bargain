@@ -4,6 +4,7 @@
   "message.njw_librarians_bargain.already_traded": "The Mysterious Contract can only be used with untraded librarians.",
   "message.njw_librarians_bargain.no_enchanted_book": "The librarian must offer an enchanted book to bargain.",
   "message.njw_librarians_bargain.no_diamonds": "You need %s Diamonds to bargain.",
+  "message.njw_librarians_bargain.not_enough_diamonds": "Not enough Diamonds.",
   "menu.njw_librarians_bargain.bargain": "Bargain with Librarian",
   "menu.njw_librarians_bargain.current_offer": "Current Offer",
   "menu.njw_librarians_bargain.new_offers": "New Offers",

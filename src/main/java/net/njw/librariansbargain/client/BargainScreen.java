@@ -1,7 +1,10 @@
 package net.njw.librariansbargain.client;
 
+import java.time.Duration;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -32,6 +35,7 @@ public class BargainScreen extends AbstractContainerScreen<BargainMenu> {
                 .bounds(leftPos + 8, topPos + 61, 104, 20).build();
         bargainButton = Button.builder(Component.empty(), button -> sendMenuButton(0))
                 .bounds(leftPos + 8, topPos + 157, 104, 20).build();
+        bargainButton.setTooltipDelay(Duration.ZERO);
         addRenderableWidget(enchantmentLockButton);
         addRenderableWidget(levelLockButton);
         addRenderableWidget(bargainButton);
@@ -69,7 +73,6 @@ public class BargainScreen extends AbstractContainerScreen<BargainMenu> {
         if (bargainButton == null) return;
 
         boolean proposalsReady = menu.areProposalsReady();
-
         enchantmentLockButton.active = proposalsReady;
         enchantmentLockButton.setMessage(Component.translatable(menu.isEnchantmentLocked()
                 ? "menu.njw_librarians_bargain.enchantment_locked"
@@ -83,6 +86,11 @@ public class BargainScreen extends AbstractContainerScreen<BargainMenu> {
         bargainButton.setMessage(Component.translatable(proposalsReady
                 ? "menu.njw_librarians_bargain.rebargain"
                 : "menu.njw_librarians_bargain.bargain_action"));
+
+        boolean enoughDiamonds = menu.hasEnoughDiamonds();
+        bargainButton.active = enoughDiamonds;
+        bargainButton.setTooltip(enoughDiamonds ? null : Tooltip.create(Component.translatable(
+                "message.njw_librarians_bargain.not_enough_diamonds").withStyle(ChatFormatting.RED)));
 
         for (int i = 0; i < proposalButtons.length; i++) {
             boolean ready = proposalsReady && !menu.getProposalBook(i).isEmpty();

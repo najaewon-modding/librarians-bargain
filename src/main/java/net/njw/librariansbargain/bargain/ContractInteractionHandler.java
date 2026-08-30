@@ -19,13 +19,18 @@ public final class ContractInteractionHandler {
         event.setCancellationResult(InteractionResult.SUCCESS);
         Player player = event.getEntity();
         if (player.level().isClientSide()) return;
+
         BargainService.ValidationResult result = BargainService.validate(event.getTarget());
         if (result == BargainService.ValidationResult.VALID) {
             if (player instanceof ServerPlayer serverPlayer && event.getTarget() instanceof Villager villager) {
+                event.getItemStack().shrink(1);
+                player.getInventory().setChanged();
+                serverPlayer.inventoryMenu.broadcastChanges();
                 openBargainMenu(serverPlayer, villager);
             }
             return;
         }
+
         String messageKey = switch (result) {
             case NOT_LIBRARIAN -> "message.njw_librarians_bargain.not_librarian";
             case ALREADY_TRADED -> "message.njw_librarians_bargain.already_traded";

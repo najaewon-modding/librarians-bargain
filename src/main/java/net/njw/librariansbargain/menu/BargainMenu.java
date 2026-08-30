@@ -1,8 +1,7 @@
 package net.njw.librariansbargain.menu;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.npc.villager.Villager;
@@ -19,12 +18,14 @@ import net.njw.librariansbargain.bargain.BargainService;
 
 public class BargainMenu extends AbstractContainerMenu {
     private static final int DISPLAY_SLOT_COUNT = 4;
-    private static final int DATA_COUNT = 8;
+    private static final int DATA_COUNT = 9;
     private static final int CURRENT_PRICE = 0;
     private static final int READY = 4;
     private static final int SELECTED = 5;
     private static final int LOCK_ENCHANTMENT = 6;
     private static final int LOCK_LEVEL = 7;
+    private static final int DIAMOND_COUNT = 8;
+    private final Inventory inventory;
     private final Villager villager;
     private final Container displayItems;
     private final ContainerData data;
@@ -42,11 +43,13 @@ public class BargainMenu extends AbstractContainerMenu {
         if (currentOffer == null) return;
         displayItems.setItem(0, currentOffer.getResult().copy());
         data.set(CURRENT_PRICE, currentOffer.getCostA().getCount());
+        data.set(DIAMOND_COUNT, countDiamonds(inventory));
     }
 
     private BargainMenu(int containerId, Inventory inventory, Villager villager, Container displayItems,
                         ContainerData data) {
         super(ModMenus.BARGAIN_MENU.get(), containerId);
+        this.inventory = inventory;
         this.villager = villager;
         this.displayItems = displayItems;
         this.data = data;
@@ -77,10 +80,6 @@ public class BargainMenu extends AbstractContainerMenu {
         return data.get(READY) == 1;
     }
 
-    public int getSelectedProposal() {
-        return data.get(SELECTED) - 1;
-    }
-
     public boolean isEnchantmentLocked() {
         return data.get(LOCK_ENCHANTMENT) == 1;
     }
@@ -92,6 +91,14 @@ public class BargainMenu extends AbstractContainerMenu {
     public int getDiamondCost() {
         if (!areProposalsReady()) return 1;
         return 1 + (isEnchantmentLocked() ? 1 : 0) + (isLevelLocked() ? 1 : 0);
+    }
+
+    public int getDiamondCount() {
+        return data.get(DIAMOND_COUNT);
+    }
+
+    public boolean hasEnoughDiamonds() {
+        return getDiamondCount() >= getDiamondCost();
     }
 
     @Override
@@ -106,9 +113,13 @@ public class BargainMenu extends AbstractContainerMenu {
 
     private boolean applyProposal(int index) {
         if (!areProposalsReady() || index < 0 || index >= proposals.length) return false;
+
         MerchantOffer proposal = proposals[index];
         if (proposal == null) return false;
-        if (BargainService.validate(villager) != BargainService.ValidationResult.VALID) return false;
+
+        if (BargainService.validate(villager) != BargainService.ValidationResult.VALID) {
+            return false;
+        }
 
         MerchantOffer currentOffer = BargainService.findEnchantedBookOffer(villager);
         if (currentOffer == null) return false;
@@ -119,6 +130,7 @@ public class BargainMenu extends AbstractContainerMenu {
         villager.getOffers().set(currentOfferIndex, proposal);
         displayItems.setItem(0, proposal.getResult().copy());
         data.set(CURRENT_PRICE, proposal.getCostA().getCount());
+
         clearProposals();
         broadcastChanges();
         return true;
@@ -148,7 +160,10 @@ public class BargainMenu extends AbstractContainerMenu {
 
     private boolean generateProposals(Player player) {
         if (!(player.level() instanceof ServerLevel level)) return false;
-        if (BargainService.validate(villager) != BargainService.ValidationResult.VALID) return false;
+
+        if (BargainService.validate(villager) != BargainService.ValidationResult.VALID) {
+            return false;
+        }
 
         boolean rerolling = areProposalsReady();
         BargainService.EnchantmentData[] previous =
@@ -167,14 +182,41 @@ public class BargainMenu extends AbstractContainerMenu {
         int diamondCost = getDiamondCost();
 
         if (!takeDiamonds(player, diamondCost)) {
-            player.closeContainer();
-            player.sendOverlayMessage(Component.translatable(
-                            "message.njw_librarians_bargain.no_diamonds", diamondCost)
-                    .withStyle(ChatFormatting.RED));
+            broadcastChanges();
             return false;
         }
 
-        boolean lockEnchantment = rerolling && isEnchantmentLocked();
+        if (!rerolling) {
+            return generateInitialProposals(level, player);
+        }
+
+        generateRerolledProposals(level, player, previous);
+        return true;
+    }
+
+    private boolean generateInitialProposals(ServerLevel level, Player player) {
+        MerchantOffer currentOffer = BargainService.findEnchantedBookOffer(villager);
+        if (currentOffer == null) return false;
+
+        proposals[0] = currentOffer;
+
+        for (int i = 1; i < proposals.length; i++) {
+            proposals[i] = BargainService.createRandomOffer(
+                    level,
+                    player.getRandom(),
+                    null,
+                    false,
+                    false
+            );
+        }
+
+        syncProposals();
+        return true;
+    }
+
+    private void generateRerolledProposals(ServerLevel level, Player player,
+                                           BargainService.EnchantmentData[] previous) {
+        boolean lockEnchantment = isEnchantmentLocked();
         boolean lockLevel = lockEnchantment && isLevelLocked();
 
         for (int i = 0; i < proposals.length; i++) {
@@ -185,7 +227,13 @@ public class BargainMenu extends AbstractContainerMenu {
                     lockEnchantment,
                     lockLevel
             );
+        }
 
+        syncProposals();
+    }
+
+    private void syncProposals() {
+        for (int i = 0; i < proposals.length; i++) {
             displayItems.setItem(i + 1, proposals[i].getResult().copy());
             data.set(i + 1, proposals[i].getCostA().getCount());
         }
@@ -193,7 +241,6 @@ public class BargainMenu extends AbstractContainerMenu {
         data.set(READY, 1);
         data.set(SELECTED, 0);
         broadcastChanges();
-        return true;
     }
 
     private void clearProposals() {
@@ -210,17 +257,8 @@ public class BargainMenu extends AbstractContainerMenu {
     }
 
     private boolean takeDiamonds(Player player, int amount) {
-        if (player.getAbilities().instabuild) return true;
-
-        Inventory inventory = player.getInventory();
-        int found = 0;
-
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (stack.is(Items.DIAMOND)) {
-                found += stack.getCount();
-            }
-        }
+        int found = countDiamonds(inventory);
+        data.set(DIAMOND_COUNT, found);
 
         if (found < amount) return false;
 
@@ -236,7 +274,35 @@ public class BargainMenu extends AbstractContainerMenu {
         }
 
         inventory.setChanged();
+        data.set(DIAMOND_COUNT, countDiamonds(inventory));
+
+        if (player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.inventoryMenu.broadcastChanges();
+        }
+
         return true;
+    }
+
+    private static int countDiamonds(Inventory inventory) {
+        int count = 0;
+
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack stack = inventory.getItem(i);
+            if (stack.is(Items.DIAMOND)) {
+                count += stack.getCount();
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public void broadcastChanges() {
+        if (villager != null) {
+            data.set(DIAMOND_COUNT, countDiamonds(inventory));
+        }
+
+        super.broadcastChanges();
     }
 
     @Override

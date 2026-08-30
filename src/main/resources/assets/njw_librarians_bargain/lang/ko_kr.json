@@ -4,6 +4,7 @@
   "message.njw_librarians_bargain.already_traded": "신비한 계약서는 아직 거래하지 않은 사서에게만 사용할 수 있습니다.",
   "message.njw_librarians_bargain.no_enchanted_book": "흥정하려면 사서의 거래 목록에 마법이 부여된 책이 있어야 합니다.",
   "message.njw_librarians_bargain.no_diamonds": "흥정하려면 다이아몬드가 %s개 필요합니다.",
+  "message.njw_librarians_bargain.not_enough_diamonds": "다이아몬드가 부족합니다.",
   "menu.njw_librarians_bargain.bargain": "사서와 흥정",
   "menu.njw_librarians_bargain.current_offer": "현재 거래",
   "menu.njw_librarians_bargain.new_offers": "새로운 제안",
